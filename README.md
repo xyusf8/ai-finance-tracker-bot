@@ -29,8 +29,9 @@ Simply send a text message, receipt photo, or voice note through Telegram, and t
 ## 🛠 Tech Stack
 
 - **n8n** — Workflow Automation
-- **Groq API** — Fast LLM for intent detection & transaction parsing
-- **Gemini 2.0 Flash** — OCR & Voice Transcription
+- **Groq API** — Fast LLM for intent detection & transaction parsing, and because it is easy and free
+- **OCR Space API** — OCR because it is easy and free
+- **Eleven Labs API** — Voice transcribe
 - **Google Sheets** — Database
 - **Telegram Bot API** — User Interface
 
