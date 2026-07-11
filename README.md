@@ -1,7 +1,6 @@
-![Stars](https://img.shields.io/github/stars/USERNAME/FinBot?style=social)
-![Forks](https://img.shields.io/github/forks/USERNAME/FinBot?style=social)
-![Last Commit](https://img.shields.io/github/last-commit/USERNAME/FinBot)
-
+![Stars](https://img.shields.io/github/stars/xyusf8/ai-finance-tracker-bot?style=flat)
+![Forks](https://img.shields.io/github/forks/xyusf8/ai-finance-tracker-bot?style=flat)
+![Last Commit](https://img.shields.io/github/last-commit/xyusf8/ai-finance-tracker-bot)
 
 # 💸 FinBot — AI-Powered Personal Finance Assistant
 
@@ -55,7 +54,8 @@ AI Intent Detection
 Transaction Report Chat Fallback
 ```
 
-*(Insert your n8n workflow screenshot here.)*
+![Workflow](docs/workflow.png)
+
 
 ## 🚀 Getting Started
 
