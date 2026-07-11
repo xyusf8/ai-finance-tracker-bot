@@ -7,7 +7,7 @@
 
 > An intelligent Telegram bot that captures, organizes, and analyzes your personal finances in seconds using AI.
 
-![Banner](finbot.png)
+![Banner](docs/banner.png)
 
 ## 🎯 Why FinBot?
 
