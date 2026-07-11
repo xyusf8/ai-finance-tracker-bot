@@ -29,7 +29,7 @@ Simply send a text message, receipt photo, or voice note through Telegram, and t
 ## 🛠️ Tech Stack
 
 - ⚙️ **n8n** — Orchestrates the entire automation workflow
-- 🧠 **Groq API (Llama 3)** — Intent detection, transaction parsing, and AI-powered conversations
+- 🧠 **Groq API** — Intent detection, transaction parsing, and AI-powered conversations
 - 📄 **OCR.Space API** — Converts receipt images into structured text using OCR
 - 🎙️ **ElevenLabs API** — Transcribes voice notes into text with high accuracy
 - 📊 **Google Sheets API** — Stores and manages financial data in real time
