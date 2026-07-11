@@ -2,6 +2,7 @@
 ![Forks](https://img.shields.io/github/forks/USERNAME/FinBot?style=social)
 ![Last Commit](https://img.shields.io/github/last-commit/USERNAME/FinBot)
 
+
 # 💸 FinBot — AI-Powered Personal Finance Assistant
 
 > An intelligent Telegram bot that captures, organizes, and analyzes your personal finances in seconds using AI.
