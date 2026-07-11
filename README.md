@@ -54,7 +54,7 @@ AI Intent Detection
 Transaction Report Chat Fallback
 ```
 
-![Workflow](docs/workflow.png)
+![workflow](docs/workflow.png)
 
 
 ## 🚀 Getting Started
