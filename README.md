@@ -26,15 +26,15 @@ Simply send a text message, receipt photo, or voice note through Telegram, and t
 - 💡 **AI Financial Chat** — Ask questions about your own spending habits and receive contextual answers.
 - ⚡ **Fully Automated Workflow** — No manual categorization or data entry required.
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
-- **n8n** — Workflow Automation
-- **Groq API** — Fast LLM for intent detection & transaction parsing, and because it is easy and free
-- **OCR Space API** — OCR because it is easy and free
-- **Eleven Labs API** — Voice transcribe
-- **Google Sheets** — Database
-- **Telegram Bot API** — User Interface
-
+- ⚙️ **n8n** — Orchestrates the entire automation workflow
+- 🧠 **Groq API (Llama 3)** — Intent detection, transaction parsing, and AI-powered conversations
+- 📄 **OCR.Space API** — Converts receipt images into structured text using OCR
+- 🎙️ **ElevenLabs API** — Transcribes voice notes into text with high accuracy
+- 📊 **Google Sheets API** — Stores and manages financial data in real time
+- 💬 **Telegram Bot API** — Provides a fast, intuitive chat interface for users
+  
 ## 🏗 Workflow Architecture
 
 > Every incoming message is normalized into a single data format before being processed by an AI-powered routing system.
