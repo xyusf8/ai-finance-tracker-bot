@@ -1,0 +1,1393 @@
+{
+  "name": "workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "5cecad58-224b-4779-aeb6-11d7f4f36481",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        176
+      ],
+      "webhookId": "REPLACE_WITH_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "PROCESSED",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1712,
+        736
+      ],
+      "id": "7b79a840-338c-44cd-8497-426cd28446d9",
+      "name": "Fetch Transaction History",
+      "credentials": {
+        "googleApi": {
+          "id": "g7azyDigHwJZ1JyZ",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\"// [REDACTED - proprietary logic]\""
+      },
+      "id": "d0bc41c8-476f-4555-802c-7df8156ef645",
+      "name": "Parse Intent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "=YOUR_GOOGLE_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "PROCESSED",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        432
+      ],
+      "id": "c0bbae14-e3f2-4115-95d0-3e444be13f36",
+      "name": "Fetch Transaction",
+      "credentials": {
+        "googleApi": {
+          "id": "g7azyDigHwJZ1JyZ",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        592
+      ],
+      "id": "e3f83109-4f0b-438c-922f-a9f8542f0358",
+      "name": "Send Chat Response",
+      "webhookId": "0cfd16ff-bd19-44bd-a80b-226d8d4f9e66",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ *Transaction Recorded Successfully!*\n\n📅 Date: {{ $('Append Transaction Sheet').item.json.Date }}\n\n📁 Category: {{ $('Append Transaction Sheet').item.json.Category }}\n📝 Description: {{ $json.Description }}\n💰 Amount: {{ $json.Income > 0 ? $json.Income + ' (Income)' : $json.Outcome + ' (Outcome)' }}\n💳 Payment Method: {{ $('Append Transaction Sheet').item.json['Payment Method'] }}\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a2993656-0db4-4630-ab53-6fe39c5cffe0",
+      "name": "Send Transaction Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        96
+      ],
+      "webhookId": "a093b143-5a03-4208-a6e1-782b5cf1afff",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\"// [REDACTED - proprietary logic]\""
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        432
+      ],
+      "id": "e123b351-ec84-4dfd-a947-6175c108800d",
+      "name": "Generate Report"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}, {{ $json.ParsedResults[0].ParsedText }}",
+                    "rightValue": "transaction",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "4128363d-3905-4b37-8500-b8e9e5fff414"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Transaction"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d982aa82-d6fe-4efe-9e1a-3bf9691eb4be",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "fallback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fallback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "63aeef94-e69a-4734-a215-86430a5bd27b",
+                    "leftValue": "={{ $json.intent }}{{ $json.report }}",
+                    "rightValue": "report",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Report"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ac5b7806-5359-4fe4-9c05-0b646590fe7b",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "chat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Chat"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ba47558-d0fa-4f00-b33d-93e11a5c76ef",
+      "name": "Intent Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1200,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').first().json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1600,
+        736
+      ],
+      "id": "c5e774e9-804c-4298-85e3-4ad08843abe0",
+      "name": " Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ce492bd1-f985-427d-9bde-8b04b4b8c04d",
+                    "leftValue": "={{ $json.message.photo[3] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "228d3d5e-1eea-4997-aaeb-b34eb5741ff2",
+                    "leftValue": "={{ !!$json.message.voice}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "99f5726e-b153-4853-9bda-475a99a00dd7",
+                    "leftValue": "={{ !!$json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        160
+      ],
+      "id": "01cf0a1f-57df-42fa-91df-9d10a3f733b7",
+      "name": "Message Type Router"
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "operation": "speechToText",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        544,
+        176
+      ],
+      "id": "72a5bd1e-e5f6-49d3-a5d8-7adad76909db",
+      "name": "Transcribe Voice LLM",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "6dpG14MEjYoimxKs",
+          "name": "ElevenLabs account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        176
+      ],
+      "id": "845d288b-e4be-4855-864b-5291bdbec368",
+      "name": "Get Voice File",
+      "webhookId": "d6cb555e-caa5-44b6-b4b4-edfaa92210c7",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a946d541-fdc5-4812-9760-20d11c91d49c",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "fe94a211-7823-4bd8-8409-ee3ea23a3374",
+              "name": "chatId",
+              "value": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        176
+      ],
+      "id": "e4d99085-1083-4021-8631-c7eb71b6534f",
+      "name": "Normalize Voice Text"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[3].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        32
+      ],
+      "id": "f2b074e0-63bb-4562-aed9-b67ad90cf87e",
+      "name": "Get Photo File",
+      "webhookId": "41d2d0a8-2d01-4de2-891a-d9765cf8219b",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ocr.space/parse/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        912,
+        32
+      ],
+      "id": "cb1b7774-707f-48ee-80a4-ef36eddbc8c7",
+      "name": "OCR Extract HTTP"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54979478-2f2a-4cbf-9b7f-af5fa6bd2f6d",
+              "name": "text",
+              "value": "={{ $json.ParsedResults[0].ParsedText }}",
+              "type": "string"
+            },
+            {
+              "id": "349ffefb-315e-41f3-bbbb-b60a52cd7f2c",
+              "name": "chatId",
+              "value": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        112
+      ],
+      "id": "033cf9d9-6539-4d01-8445-4d25794e9d62",
+      "name": "Normalize OCR Text"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=[REDACTED - proprietary promt logic]",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        624,
+        400
+      ],
+      "id": "8064851b-396a-4d07-954a-afef09f826d2",
+      "name": "Classify Intent LLM"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        624,
+        544
+      ],
+      "id": "4e9958a9-db7e-4d68-9bd0-68a92926aaaa",
+      "name": "Groq Classifier Model",
+      "credentials": {
+        "groqApi": {
+          "id": "pk4YHl8uf1wzV8OT",
+          "name": "Groq account 21"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=[REDACTED - proprietary promt logic]",
+        "messages": {
+          "messageValues": []
+        }
+      },
+      "id": "5ff99b98-d2aa-49d3-97eb-4d89ca2cf752",
+      "name": "Extract Transaction LLM",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1488,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "95dddadd-4c1c-400e-ab11-2ab456fba8a7",
+              "leftValue": "={{ Number($json.text.match(/Income: (.+)/)?.[1]) || 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "e973cde2-914c-43c6-a610-d513996f1e0c",
+              "leftValue": "={{ Number($json.text.match(/Outcome: (.+)/)?.[1]) || 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1776,
+        112
+      ],
+      "id": "36676e1b-1495-468e-a78c-ddb90d0dff41",
+      "name": "Validate Extraction"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=YOUR_GOOGLE_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "PROCESSED",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Category": "={{ $json.text.match(/Category: (.+)/)?.[1] || 'Uncategorized' }}",
+            "Date": "={{ $json.text.match(/Date: (.+)/)?.[1] || '' }}",
+            "Description": "={{ $json.text.match(/Description: (.+)/)?.[1] || '' }}",
+            "Income": "={{ Number($json.text.match(/Income: (.+)/)?.[1]) || 0 }}",
+            "Balance": "==IF(ROW()=2; D2-E2; INDIRECT(\"G\"&ROW()-1)+INDIRECT(\"D\"&ROW())-INDIRECT(\"E\"&ROW()))",
+            "Outcome": "={{ Number($json.text.match(/Outcome: (.+)/)?.[1]) || 0 }}",
+            "Payment Method": "={{ $json.text.match(/Payment_Method: (.+)/)?.[1] || 'Cash' }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Income",
+              "displayName": "Income",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Outcome",
+              "displayName": "Outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Payment Method",
+              "displayName": "Payment Method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a23521db-bca4-4a33-8d31-6c5300a73692",
+      "name": "Append Transaction Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1984,
+        96
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "g7azyDigHwJZ1JyZ",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=📊 *FINANCIAL REPORT ({{ $json.report }})*\n\n💵 *Total Income:* {{ $json.totalIncome }}\n💸 *Total Expenses:* {{ $json.totalExpenses }}\n📈 *Net Change (this period):* {{ $json.netBalance }}\n💰 *Current Total Balance:* {{ $json.currentBalance }}\n\n📝 *Transaction Details ({{ $json.transactionCount }} recorded):*\n{{ $json.transactionDetail }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3053da11-b89e-4bb5-a1dc-325a824c399b",
+      "name": "Send Report Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        432
+      ],
+      "webhookId": "4ee22fd4-5ea1-4630-a7ad-9be13bc66ddd",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=[REDACTED - proprietary promt logic]",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1504,
+        592
+      ],
+      "id": "cbd62faf-3226-4815-b82a-4c019ac0588f",
+      "name": "Finance Chat Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        736
+      ],
+      "id": "0954b15b-e445-4da0-bd0d-373fa36c3d82",
+      "name": "Groq Agent Model",
+      "credentials": {
+        "groqApi": {
+          "id": "pk4YHl8uf1wzV8OT",
+          "name": "Groq account 21"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "🤖 *Hmm, I didn't quite get that!*\nPlease try sending a clearer message. Here are some examples:\n\n📝 *To record a transaction:*\n→ \"Bought coffee 15000 cash\"\n→ \"Got salary 5000000 bank transfer\"\n→ \"Paid electricity bill 200000 yesterday\"\n→ Or send a receipt photo / voice note 🎤📷\n\n📊 *To get a report:*\n→ \"Today's report\"\n→ \"This week expenses\"\n→ \"Show total salary\"\n\n💬 *To ask something:*\n→ \"How do I manage finances better?\"\n\n📷🎤 *If your photo or voice note wasn't clear:*\n→ Make sure the receipt photo isn't blurry and well-lit\n→ Speak clearly and avoid background noise\n\nPlease try again! 😊",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        368
+      ],
+      "id": "962080eb-8755-41e0-96f2-53b9e5f73b62",
+      "name": "Send Fallback Message",
+      "webhookId": "408261c9-afaa-4cf6-bda1-7b1379d14916",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "caea6d3f-c645-4209-95b4-2c3f6aabdfe2",
+              "name": "text",
+              "value": "={{ $json.text }} {{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        400
+      ],
+      "id": "df7812fc-af03-4ad4-856f-748421a5ed3d",
+      "name": "Normalize Text Input"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 19
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        608
+      ],
+      "id": "dfd95f3d-6ee7-4d78-9588-769057c6c787",
+      "name": "Daily Report Schedule"
+    },
+    {
+      "parameters": {
+        "jsCode": "\"// [REDACTED - proprietary logic]\""
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        608
+      ],
+      "id": "685728cb-8708-467c-9037-7a4955c8e0a0",
+      "name": "Build Scheduled Report Params"
+    },
+    {
+      "parameters": {
+        "content": "## 📥 INPUT HANDLING\n",
+        "height": 336,
+        "width": 1392
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "95ed6290-b30d-46b7-b283-da737b385a63",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 🧠 INTENT CLASSIFICATION\n",
+        "height": 224,
+        "width": 848,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "2f325752-2de5-4a7a-864d-6a667ab36a13",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 🔀 ROUTING\n\n",
+        "height": 224,
+        "width": 272,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "f72616cb-c2ed-4ab1-a188-36be53fb997c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 💰 TRANSACTION BRANCH\n",
+        "height": 352,
+        "width": 976,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "7babd491-9730-4ee1-b214-6c975f7864f9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 📊 REPORT BRANCH\n",
+        "height": 224,
+        "width": 736,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "b431a969-4a63-4cfa-b0c6-62cbb55c146c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 💬 CHAT BRANCH\n",
+        "height": 240,
+        "width": 736,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "be024e9a-89f4-4f6e-873d-c7162da8b49a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## ⏰ SCHEDULED REPORT\n",
+        "height": 240,
+        "width": 640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        752,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "9c8d6854-4334-4be2-a00e-8ff319a38e25",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ FALLBACK\n",
+        "height": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2128,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "6e0c97a6-a85d-403f-bd29-a83f2fea1008",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        256
+      ],
+      "id": "c1402075-ffb6-4c8a-9d27-cd1dc8d8e521",
+      "name": "-",
+      "credentials": {
+        "groqApi": {
+          "id": "pk4YHl8uf1wzV8OT",
+          "name": "Groq account 21"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Transaction History": {
+      "ai_tool": [
+        [
+          {
+            "node": "Finance Chat Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Intent": {
+      "main": [
+        [
+          {
+            "node": "Intent Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Transaction": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent Router": {
+      "main": [
+        [
+          {
+            "node": "Extract Transaction LLM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Fallback Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Transaction",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finance Chat Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    " Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Finance Chat Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Type Router": {
+      "main": [
+        [
+          {
+            "node": "Get Photo File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normalize Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Voice LLM": {
+      "main": [
+        [
+          {
+            "node": "Normalize Voice Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Voice File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Voice LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Voice Text": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Photo File": {
+      "main": [
+        [
+          {
+            "node": "OCR Extract HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Extract HTTP": {
+      "main": [
+        [
+          {
+            "node": "Normalize OCR Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize OCR Text": {
+      "main": [
+        [
+          {
+            "node": "Extract Transaction LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Intent LLM": {
+      "main": [
+        [
+          {
+            "node": "Parse Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Classifier Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classify Intent LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Transaction LLM": {
+      "main": [
+        [
+          {
+            "node": "Validate Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Extraction": {
+      "main": [
+        [
+          {
+            "node": "Append Transaction Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Fallback Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Transaction Sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Transaction Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Chat Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Agent Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Finance Chat Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Text Input": {
+      "main": [
+        [
+          {
+            "node": "Classify Intent LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Report Schedule": {
+      "main": [
+        [
+          {
+            "node": "Build Scheduled Report Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Scheduled Report Params": {
+      "main": [
+        [
+          {
+            "node": "Intent Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "-": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Transaction LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c52d8b03-f4d2-4f3d-b29b-a5f0cf38ab7a",
+  "meta": {
+    "instanceId": "d2e5c81f36b3fb44b914d2b713f588a1feeaf33a9a6f7f2354052708e50fa870"
+  },
+  "id": "pcGDJm7SNtv0YaBL",
+  "tags": [
+    {
+      "name": "redacted",
+      "id": "6OAz8E06c0bE2MT1",
+      "updatedAt": "2026-07-14T05:58:39.516Z",
+      "createdAt": "2026-07-14T05:58:39.516Z"
+    }
+  ]
+}
