@@ -50,19 +50,19 @@ Beyond simple daily/weekly summaries, you can request reports by custom date ran
 > Every incoming message is normalized into a single data format before being processed by an AI-powered routing system.
 
 ```
-Telegram
-      │
-      ▼
+  Telegram
+        │
+        ▼
 Normalize Input
 (Text / Photo / Voice)
-      │
-      ▼
+        │
+        ▼
 AI Intent Detection
-      │
- ┌────┼────┬─────┐
- │    │    │     │
- ▼    ▼    ▼     ▼
-Transaction Report Chat Fallback
+        │
+   ┌────┼──────┬─────────┐
+   │    │      │         │
+   ▼    ▼      ▼         ▼
+Report Chat Fallback Transaction
 ```
 
 ![workflow](docs/workflow.png)
