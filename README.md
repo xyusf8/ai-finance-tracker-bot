@@ -8,7 +8,7 @@
 
 ![Banner](docs/banner.png)
 
-### 📋 Overview
+## 📋 Overview
 
 Traditional expense tracking is slow, repetitive, and easy to abandon. Most finance apps require multiple manual steps just to record a single transaction.
 
