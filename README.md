@@ -8,7 +8,7 @@
 
 ![Banner](docs/banner.png)
 
-## 📋 Overview
+### 📋 Overview
 
 Traditional expense tracking is slow, repetitive, and easy to abandon. Most finance apps require multiple manual steps just to record a single transaction.
 
@@ -17,12 +17,13 @@ FinBot removes that friction.
 Simply send a text message, receipt photo, or voice note through Telegram, and the AI automatically understands, categorizes, and stores your transaction—without opening another app.
 
 ## 🌟 What Makes FinBot Different
+
 Most finance bots only support today's date and offer rigid, one-size-fits-all reports. FinBot is built to handle how people actually think about their money:
 
-**Log transactions for any date, not just today.**
+**Log transactions for any date, not just today.**  
 Say *"paid electricity bill yesterday"* or *"lunch on July 5th, 45k"* — the bot understands the time reference and records it under the correct date, not the date the message was sent.
 
-**Ask for the report you actually want.**
+**Ask for the report you actually want.**  
 Beyond simple daily/weekly summaries, you can request reports by custom date range, filtered by category, or filtered by payment method — just by asking in plain language, no menus or filters to configure.
 
 ## ✨ Key Features
@@ -68,28 +69,30 @@ Transaction Report Chat Fallback
 
 ### How It Works
 
-**📥 Input Handling**
-The bot accepts 3 input types — typed text, voice notes, and receipt photos. Each is normalized into a consistent `text` field before further processing.
+**📥 Input Handling**  
+The bot accepts 3 input types — typed text, voice notes, and receipt 
+photos. Each is normalized into a consistent `text` field before further 
+processing.
 
-**🧠 Intent Classification**
+**🧠 Intent Classification**  
 Classifies the user's message into one of four intents — transaction, report, chat, or fallback — including period and filter detection for report queries.
 
-**🔀 Routing**
+**🔀 Routing**  
 Routes to the matching branch based on the classified intent. Photo input skips this step entirely — receipts always go straight to the Transaction branch.
 
-**💰 Transaction Branch**
+**💰 Transaction Branch**  
 Extracts structured data (date, category, amount, payment method) via LLM, validates that it's not empty, then logs the entry to Google Sheets with an auto-calculated running balance.
 
-**📊 Report Branch**
+**📊 Report Branch**  
 Filters transactions by period (today/week/month/custom) and by category or payment method, then returns income, expenses, and running balance.
 
-**💬 Chat Branch**
+**💬 Chat Branch**  
 An AI agent answers general finance questions and can pull transaction history from Sheets when the user asks about their own data.
 
-**⏰ Scheduled Report**
+**⏰ Scheduled Report**  
 Sends a daily financial report automatically at 7 PM, using the same Report Branch logic as manual requests.
 
-**⚠️ Fallback**
+**⚠️ Fallback**  
 Catches unclear messages and failed voice/photo extraction — guiding the user with example commands instead of leaving them stuck.
 
 ## 🚀 Getting Started
@@ -113,7 +116,7 @@ Building FinBot taught me how to:
 
 - **Design scalable AI workflows** using n8n's visual branching instead of hardcoded conditionals, making the system easier to debug and extend.
 - **Combine multiple AI models based on their strengths** — routing latency-sensitive text tasks to Groq while reserving Gemini for multimodal inputs it handles natively.
-- **Process text, images, and voice through a unified pipeline** by normalizing every input type to a single format before any downstream logic runs.
+- **Normalize diverse input types (text, voice, photos) into a consistent format** while still allowing different processing paths — e.g. receipts skip intent classification and go straight to transaction logging, since their intent is always unambiguous.
 - **Build reliable intent-routing systems** for conversational apps, including handling misclassification on informal, mixed-language input through prompt engineering rather than more complex code.
 
 
