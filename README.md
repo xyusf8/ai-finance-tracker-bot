@@ -2,13 +2,13 @@
 ![Forks](https://img.shields.io/github/forks/xyusf8/ai-finance-tracker-bot?style=flat)
 ![Last Commit](https://img.shields.io/github/last-commit/xyusf8/ai-finance-tracker-bot)
 
-# 💸 FinBot — AI-Powered Personal Finance Assistant
+# 💸 FinBot — AI-Powered Personal Finance Assistant With n8n
 
 > An intelligent Telegram bot that captures, organizes, and analyzes your personal finances in seconds using AI.
 
 ![Banner](docs/banner.png)
 
-## 🎯 Why FinBot?
+## 📋 Overview
 
 Traditional expense tracking is slow, repetitive, and easy to abandon. Most finance apps require multiple manual steps just to record a single transaction.
 
@@ -16,14 +16,22 @@ FinBot removes that friction.
 
 Simply send a text message, receipt photo, or voice note through Telegram, and the AI automatically understands, categorizes, and stores your transaction—without opening another app.
 
+## 🌟 What Makes FinBot Different
+Most finance bots only support today's date and offer rigid, one-size-fits-all reports. FinBot is built to handle how people actually think about their money:
+
+**Log transactions for any date, not just today.**
+Say *"paid electricity bill yesterday"* or *"lunch on July 5th, 45k"* — the bot understands the time reference and records it under the correct date, not the date the message was sent.
+
+**Ask for the report you actually want.**
+Beyond simple daily/weekly summaries, you can request reports by custom date range, filtered by category, or filtered by payment method — just by asking in plain language, no menus or filters to configure.
+
 ## ✨ Key Features
 
-- 💬 **Natural Language Input** — Log expenses in plain conversational text — no rigid command format required.
-  Supports flexible date references like *"today," "yesterday,"* or a specific date (e.g., *"paid electricity bill on July 5th"*), and the transaction is recorded with the correct date automatically.
+- 💬 **Natural Language Input** — Log income or expenses in plain conversational text, with flexible date recognition (today, yesterday, or a specific date).
 - 📸 **Receipt Scanner** — Extract transaction data automatically using AI-powered OCR.
 - 🎙️ **Voice Recognition** — Talk to the bot instead of typing — voice notes are transcribed and routed through the same AI pipeline as text, so you can log a transaction, ask for a report, or ask a financial question, all by voice.
 - 🤖 **AI Intent Detection** — Automatically understands whether you're recording a transaction, requesting a report, or asking financial questions.
-- 📊 **Flexible Reports** — Generate daily, weekly, monthly, or custom-date reports — including breakdowns by specific category or payment method, simply by asking.
+- 📊 **Flexible Reports** — Daily, weekly, monthly, custom-date, or filtered by category and payment method.
 - 💡 **AI Financial Chat** — Ask questions about your own spending habits and receive contextual answers.
 - ⚡ **Fully Automated Workflow** — No manual categorization or data entry required.
 
@@ -60,24 +68,29 @@ Transaction Report Chat Fallback
 
 ### How It Works
 
-**1. Input Normalization**
-Photos are sent to OCR space for OCR extraction; voice notes are transcribed by Eleven Labs model. Both outputs, along with raw text input, converge into the same `$json.text` field — so every downstream node only ever deals with plain text.
+**📥 Input Handling**
+The bot accepts 3 input types — typed text, voice notes, and receipt photos. Each is normalized into a consistent `text` field before further processing.
 
-**2. Intent Detection**
-A Groq-powered classification step reads the normalized text and routes it into one of four branches. Getting this reliable — especially for casual, mixed-language input — required few-shot examples in the prompt and a temperature of 0 to keep classification consistent rather than creative.
+**🧠 Intent Classification**
+Classifies the user's message into one of four intents — transaction, report, chat, or fallback — including period and filter detection for report queries.
 
-**3. Transaction Branch**
-Parses amount, category, and description from natural language, then appends a structured row to Google Sheets. Output is constrained to a strict pipe-separated format so the parser never has to guess field boundaries.
+**🔀 Routing**
+Routes to the matching branch based on the classified intent. Photo input skips this step entirely — receipts always go straight to the Transaction branch.
 
-**4. Report Branch**
-Pulls the relevant date range from Sheets and generates a natural-language summary — daily reports run on a schedule, weekly/custom reports run on request.
+**💰 Transaction Branch**
+Extracts structured data (date, category, amount, payment method) via LLM, validates that it's not empty, then logs the entry to Google Sheets with an auto-calculated running balance.
 
-**5. Chat Branch**
-Uses an AI agent with tool access to the user's own Sheet, allowing free-form questions like *"what did I spend the most on this month?"* to be answered with real data instead of a canned response.
+**📊 Report Branch**
+Filters transactions by period (today/week/month/custom) and by category or payment method, then returns income, expenses, and running balance.
 
-**6. Fallback Branch**
-Catches anything that doesn't clearly match the other three, prompting the user for clarification instead of failing silently.
+**💬 Chat Branch**
+An AI agent answers general finance questions and can pull transaction history from Sheets when the user asks about their own data.
 
+**⏰ Scheduled Report**
+Sends a daily financial report automatically at 7 PM, using the same Report Branch logic as manual requests.
+
+**⚠️ Fallback**
+Catches unclear messages and failed voice/photo extraction — guiding the user with example commands instead of leaving them stuck.
 
 ## 🚀 Getting Started
 
