@@ -24,7 +24,7 @@ Most finance bots only support today's date and offer rigid, one-size-fits-all r
 Say *"paid electricity bill yesterday"* or *"lunch on July 5th, 45k"* — the bot understands the time reference and records it under the correct date, not the date the message was sent.
 
 **Ask for the report you actually want.**  
-Beyond simple daily/weekly summaries, you can request reports by custom date range, filtered by category, or filtered by payment method — just by asking in plain language, no menus or filters to configure.
+Beyond simple daily/weekly summaries, you can request reports by custom date and date range, filtered by category, or filtered by payment method — just by asking in plain language, no menus or filters to configure.
 
 ## ✨ Key Features
 
