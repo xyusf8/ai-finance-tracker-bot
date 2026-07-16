@@ -32,7 +32,7 @@ Beyond simple daily/weekly summaries, you can request reports by custom date ran
 - 📸 **Receipt Scanner** — Extract transaction data automatically using AI-powered OCR.
 - 🎙️ **Voice Recognition** — Talk to the bot instead of typing — voice notes are transcribed and routed through the same AI pipeline as text, so you can log a transaction, ask for a report, or ask a financial question, all by voice.
 - 🤖 **AI Intent Detection** — Automatically understands whether you're recording a transaction, requesting a report, or asking financial questions.
-- 📊 **Flexible Reports** — Daily, weekly, monthly, custom-date, or filtered by category and payment method.
+- 📊 **Flexible Reports** — Daily, weekly, monthly, custom-date and date range, or filtered by category and payment method.
 - 💡 **AI Financial Chat** — Ask questions about your own spending habits and receive contextual answers.
 - ⚡ **Fully Automated Workflow** — No manual categorization or data entry required.
 
